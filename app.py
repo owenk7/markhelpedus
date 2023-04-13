@@ -94,7 +94,7 @@ def predict(data:dict):
 import jsonify
 
 
-@app.route('/predict', methods=['POST'])
+@app.post('/predict')
 def predict():
     with open('./MF_XGB_XV2.pkl','rb') as file:
         model = pickle.load(file)
