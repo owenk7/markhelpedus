@@ -1,5 +1,6 @@
 import pickle
 import pandas as pd
+import xgboost as xgb
 from sklearn import preprocessing
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,13 +27,17 @@ def predict(data:dict):
   # Load model from .pkl file
   with open('./MF_XGB_XV2.pkl','rb') as file:
     model = pickle.load(file)
+    # Convert the DataFrame to a DMatrix object
+    d_input = xgb.DMatrix(data)
+
+    # Make the prediction using the XGBoost model
+    prediction = model.predict(d_input)
     # Convert input data to DataFrame
-    df = pd.DataFrame(data, index=[0])
-    # Make prediction
-    prediction = model.predict(df)
+    # df = pd.DataFrame(data, index=[0])
+    # # Make prediction
+    # prediction = model.predict(df)
     # Return Prediction as JSON response
     return {'prediction': prediction[0]}
-  
 
   #second one
 
@@ -42,9 +47,15 @@ def predict(data:dict):
   # Load model from .pkl file
   with open('./final_wrappingXGB_XV2.pkl','rb') as file:
     model = pickle.load(file)
+
+    # Convert the DataFrame to a DMatrix object
+    d_input = xgb.DMatrix(data)
+
+    # Make the prediction using the XGBoost model
+    prediction = model.predict(d_input)
     # Convert input data to DataFrame
-    df = pd.DataFrame(data, index=[0])
-    # Make prediction
-    prediction = model.predict(df)
+    # df = pd.DataFrame(data, index=[0])
+    # # Make prediction
+    # prediction = model.predict(df)
     # Return Prediction as JSON response
     return {'prediction': prediction[0]}
