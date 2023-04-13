@@ -1,9 +1,11 @@
 import pickle
+from urllib import request
 import pandas as pd
 import xgboost as xgb
 from sklearn import preprocessing
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 
 app = FastAPI()
 
@@ -86,3 +88,44 @@ def predict(data:dict):
     # prediction = model.predict(df)
     # Return Prediction as JSON response
     return {'prediction': prediction[0]}
+  
+
+
+import jsonify
+
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    with open('./MF_XGB_XV2.pkl','rb') as file:
+        model = pickle.load(file)
+    # Get the input data as a JSON object
+    data = request.get_json()
+    # Check if the Content-Type header is set to "application/json"
+    content_type = request.headers.get('Content-Type')
+    if content_type != 'application/json':
+        return jsonify({'error': 'Invalid Content-Type header'}), 400
+    # Convert the input data into a pandas DataFrame
+    df = pd.DataFrame.from_dict(data, orient='index').T
+    # Convert "depth" and "length" columns to floats
+    df["depth"] = df["depth"].astype(float)
+    df["length"] = df["length"].astype(float)
+    # Convert categorical variables to category data type
+    cat_cols = ["headdirection", "depth", "facebundles",
+                'goods', 'wrapping', 'haircolor', 'samplescollected', 'length', 'ageatdeath']
+    for col in cat_cols:
+        df[col] = df[col].astype("category")
+    # Reorder the columns in the DataFrame to match the order of the features in the XGBoost model
+    df = df[["headdirection", "depth", "facebundles",
+             'goods', 'wrapping', 'haircolor', 'samplescollected', 'length', 'ageatdeath']]
+    # Make predictions using the XGBoost model
+    dtest = xgb.DMatrix(df, enable_categorical=True)
+    y_pred = model.predict(dtest)
+    # Convert the output from 1/0 to "male"/"female"
+    result = []
+    for p in y_pred:
+        if p == 1:
+            result.append("male")
+        else:
+            result.append("female")
+
+    return jsonify(predictions=result)
