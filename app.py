@@ -45,25 +45,25 @@ import numpy as np
 import scipy.sparse as sp
 import xgboost as xgb
 
-@app.post('/predictsex')
-def predict(data:dict):
-  # Load model from .pkl file
-  with open('./MF_XGB_XV2.pkl','rb') as file:
-    model = pickle.load(file)
-    # Convert the dictionary input to a sparse matrix
-    row = np.zeros(len(data))
-    col = np.arange(len(data))
-    data_sparse = sp.coo_matrix((row, (row, col)), shape=(1, len(data)))
-    for key, value in data.items():
-        if isinstance(value, str):
-            value = [value]
-        data_sparse[0, col[key]] = value
-    d_input = xgb.DMatrix(data_sparse)
+# @app.post('/predictsex')
+# def predict(data:dict):
+#   # Load model from .pkl file
+#   with open('./MF_XGB_XV2.pkl','rb') as file:
+#     model = pickle.load(file)
+#     # Convert the dictionary input to a sparse matrix
+#     row = np.zeros(len(data))
+#     col = np.arange(len(data))
+#     data_sparse = sp.coo_matrix((row, (row, col)), shape=(1, len(data)))
+#     for key, value in data.items():
+#         if isinstance(value, str):
+#             value = [value]
+#         data_sparse[0, col[key]] = value
+#     d_input = xgb.DMatrix(data_sparse)
 
-    # Make the prediction using the XGBoost model
-    prediction = model.predict(d_input)
-    # Return Prediction as JSON response
-    return {'prediction': prediction[0]}
+#     # Make the prediction using the XGBoost model
+#     prediction = model.predict(d_input)
+#     # Return Prediction as JSON response
+#     return {'prediction': prediction[0]}
 
 
 
@@ -129,3 +129,28 @@ def predict():
             result.append("female")
 
     return jsonify(predictions=result)
+
+
+
+
+
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class InputData(BaseModel):
+    headdirection: str
+    depth: float
+    facebundles: str
+    goods: str
+    wrapping: str
+    haircolor: str
+    samplescollected: str
+    length: float
+    ageatdeath: str
+
+@app.post('/predictsex3')
+def predict(input_data: InputData):
+    return "Predicted sex: Male"
