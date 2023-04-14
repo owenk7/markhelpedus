@@ -1,11 +1,8 @@
 import pickle
 from urllib import request
 import pandas as pd
-import xgboost as xgb
-from sklearn import preprocessing
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import requests
 
 app = FastAPI()
 
@@ -27,8 +24,6 @@ from fastapi import FastAPI, HTTPException
 import pickle
 import pandas as pd
 
-app = FastAPI()
-
 # Load the saved model
 with open("DTCmodel.pkl", "rb") as f:
     model = pickle.load(f)
@@ -47,15 +42,15 @@ async def predict(input_data: dict):
 
 
 with open("DTCmodelSEX.pkl", "rb") as f:
-    model = pickle.load(f)
+    model2 = pickle.load(f)
 
 # Define the predict endpoint
 @app.post("/predictsex")
-async def predict(input_data: dict):
+async def predict(input_data2: dict):
     try:
-        input_df = pd.DataFrame([input_data])
-        prediction = model.predict(input_df)
-        label = "Male" if prediction[0] == "M" else "Female"
-        return {"prediction": label}    
+        input_df2 = pd.DataFrame([input_data2])
+        prediction2 = model2.predict(input_df2)
+        label2 = "Male" if prediction2[0] == "M" else "Female"
+        return {"prediction": label2}    
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
