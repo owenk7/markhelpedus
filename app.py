@@ -43,3 +43,16 @@ async def predict(input_data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+with open("DTCmodelSEX.pkl", "rb") as f:
+    model = pickle.load(f)
+
+# Define the predict endpoint
+@app.post("/predictsex")
+async def predict(input_data: dict):
+    try:
+        input_df = pd.DataFrame([input_data])
+        prediction = model.predict(input_df)
+        return {"prediction": prediction[0]}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
