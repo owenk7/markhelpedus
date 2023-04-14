@@ -39,7 +39,9 @@ async def predict(input_data: dict):
     try:
         input_df = pd.DataFrame([input_data])
         prediction = model.predict(input_df)
-        return {"prediction": prediction[0]}
+        label_map = {"B": "Bones (No Wrapping)", "H": "Half Wrap", "W": "Whole Wrap"}
+        label = label_map[prediction[0]]
+        return {"prediction": label}    
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -53,6 +55,7 @@ async def predict(input_data: dict):
     try:
         input_df = pd.DataFrame([input_data])
         prediction = model.predict(input_df)
-        return {"prediction": prediction[0]}
+        label = "Male" if prediction[0] == "M" else "Female"
+        return {"prediction": label}    
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
